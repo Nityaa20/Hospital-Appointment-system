@@ -23,7 +23,7 @@ chmod +x start_mac_linux.sh
 
 Then open **http://localhost:5000** in your browser.
 
----
+
 
 ## 🔑 Demo Login Credentials
 
@@ -39,7 +39,7 @@ Then open **http://localhost:5000** in your browser.
 
 All 25 doctor usernames = their last name in lowercase.
 
----
+
 
 ## 🏗️ Project Structure
 
@@ -105,7 +105,7 @@ mediflow/
 | Frontend  | HTML5 + CSS3 + Vanilla JS |
 | Fonts     | Google Fonts (DM Sans)  |
 
----
+
 
 ## 📋 Departments & Doctors
 
@@ -117,7 +117,7 @@ mediflow/
 | Pediatrics  | Dr. Alice, Dr. Bob, Dr. Charlie, Dr. Diana, Dr. Eve   | 116–120 |
 | Dermatology | Dr. White, Dr. Black, Dr. Grey, Dr. Brown, Dr. Green  | 121–125 |
 
----
+
 
 ## ⚙️ Manual Setup (if scripts don't work)
 
@@ -130,7 +130,7 @@ python app.py        # Starts server on port 5000
 
 Then visit: http://localhost:5000
 
----
+
 
 ## 🔒 Security Notes
 
@@ -140,7 +140,7 @@ Then visit: http://localhost:5000
 - Patients can only view/edit their own appointments
 - Doctors can only view their own schedule
 
----
+
 
 ## 📡 API Endpoints
 

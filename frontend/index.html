@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediFlow — Smart Hospital System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+<div id="toastContainer" class="toast-container"></div>
+<div id="loader" class="global-loader"><div class="spinner"></div></div>
+<div id="modalOverlay" class="modal-overlay" onclick="closeModal()"></div>
+<div id="modalBox" class="modal-box"></div>
+
+<!-- ═══════════════════════════════════════════════
+     ROLE SELECT
+═══════════════════════════════════════════════ -->
+<div id="page-role" class="page active">
+  <div class="hero-bg">
+    <div class="hero-content">
+      <div class="brand-mark">
+        <div class="brand-icon">🏥</div>
+        <span class="brand-name">MediFlow</span>
+      </div>
+      <p class="hero-tagline">Smart Healthcare, Seamlessly Connected</p>
+      <div class="role-grid">
+        <div class="role-card" onclick="goToLogin('patient')">
+          <div class="role-card-icon">👤</div>
+          <div class="role-card-body">
+            <h3>Patient</h3>
+            <p>Book & manage your appointments</p>
+          </div>
+          <span class="role-arrow">→</span>
+        </div>
+        <div class="role-card" onclick="goToLogin('doctor')">
+          <div class="role-card-icon">🩺</div>
+          <div class="role-card-body">
+            <h3>Doctor</h3>
+            <p>View schedule & patient records</p>
+          </div>
+          <span class="role-arrow">→</span>
+        </div>
+        <div class="role-card" onclick="goToLogin('receptionist')">
+          <div class="role-card-icon">🏢</div>
+          <div class="role-card-body">
+            <h3>Reception</h3>
+            <p>Manage hospital operations</p>
+          </div>
+          <span class="role-arrow">→</span>
+        </div>
+      </div>
+      <p class="demo-hint">Demo — Patient: <code>patient1 / 1234</code> &nbsp;|&nbsp; Doctor: <code>[username] / 1234</code> &nbsp;|&nbsp; Reception: <code>reception / 1234</code></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     LOGIN
+═══════════════════════════════════════════════ -->
+<div id="page-login" class="page">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <button class="back-btn" onclick="showPage('role')">← Back</button>
+      <div id="loginRoleBadge" class="role-badge">Patient</div>
+      <h2 class="login-title">Welcome back</h2>
+      <p class="login-sub" id="loginSub">Sign in to your patient portal</p>
+
+      <div id="doctorLoginExtras" style="display:none">
+        <div class="field">
+          <label>Department</label>
+          <select id="loginDept" onchange="loginDeptChanged()">
+            <option value="">Select Department</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Your Name (Doctor)</label>
+          <select id="loginDrSelect">
+            <option value="">Select your name</option>
+          </select>
+        </div>
+        <p class="field-hint">Your username is your last name in lowercase (e.g. Dr. Sharma → sharma)</p>
+      </div>
+
+      <div id="registerFields" style="display:none">
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" id="regFullName" placeholder="Your full name">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="regEmail" placeholder="you@email.com">
+        </div>
+        <div class="field">
+          <label>Phone</label>
+          <input type="tel" id="regPhone" placeholder="+91 99999 99999">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="loginUsername" placeholder="Enter username" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+          <button class="pw-toggle" type="button" onclick="togglePw()">👁</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="loginBtn" onclick="handleLogin()">Sign In →</button>
+
+      <div id="patientRegToggle" style="display:none;margin-top:14px;text-align:center;">
+        <span class="text-muted" id="regToggleText">Don't have an account?</span>
+        <button class="link-btn" id="regToggleBtn" onclick="toggleRegister()">Register</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PATIENT DASHBOARD
+═══════════════════════════════════════════════ -->
+<div id="page-patient" class="page">
+  <nav class="topnav">
+    <div class="nav-left">
+      <span class="nav-logo">MediFlow</span>
+      <span class="nav-role-tag patient-tag">Patient</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-avatar patient-av" id="patientNavAvatar">P</div>
+      <span class="nav-name" id="patientNavName">Patient</span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div class="page-body">
+    <div class="stats-row" id="patientStats"></div>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="p-book" onclick="switchTab(this,'p-book','patient')">📅 Book Appointment</button>
+      <button class="tab-btn" data-tab="p-history" onclick="switchTab(this,'p-history','patient')">📋 My Appointments</button>
+    </div>
+
+    <!-- BOOK TAB -->
+    <div id="tab-p-book" class="tab-panel active">
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title" id="bookCardTitle">📝 Book New Appointment</div>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>Full Name *</label><input type="text" id="pName" placeholder="Your full name"></div>
+          <div class="field"><label>Age *</label><input type="number" id="pAge" placeholder="Age" min="0" max="120"></div>
+          <div class="field"><label>Sex *</label>
+            <select id="pSex"><option value="">Select</option><option>Male</option><option>Female</option><option>Others</option></select>
+          </div>
+          <div class="field"><label>Phone *</label><input type="tel" id="pPhone" placeholder="+91 99999 99999"></div>
+          <div class="field"><label>Department *</label>
+            <select id="pDept" onchange="deptChanged('pDept','pDr','pRoom')">
+              <option value="">Select Department</option>
+            </select>
+          </div>
+          <div class="field"><label>Doctor *</label>
+            <select id="pDr" onchange="drChanged('pDr','pRoom','pSlotWrap','pDate')">
+              <option value="">Select Doctor</option>
+            </select>
+          </div>
+          <div class="field"><label>Allocated Room</label><input type="text" id="pRoom" readonly placeholder="Auto-assigned"></div>
+          <div class="field"><label>Date *</label><input type="date" id="pDate" onchange="loadSlots('pDate','pDr','pSlot')"></div>
+          <div class="field" id="pSlotWrap">
+            <label>Time Slot *</label>
+            <select id="pSlot"><option value="">Select slot</option></select>
+          </div>
+          <div class="field"><label>Reason / Symptoms</label><input type="text" id="pReason" placeholder="Brief description (optional)"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="bookBtn" onclick="submitBooking()">Book Appointment</button>
+          <button class="btn btn-ghost" id="cancelEditBtn" onclick="cancelEdit()" style="display:none">✕ Cancel Edit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div id="tab-p-history" class="tab-panel">
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">📋 My Appointments</div>
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="pSearch" placeholder="🔍 Search..." oninput="loadPatientAppts()">
+          <select id="pStatusFilter" onchange="loadPatientAppts()">
+            <option value="">All Status</option>
+            <option>Pending</option><option>Attended</option><option>Cancelled</option>
+          </select>
+          <input type="date" id="pDateFilter" onchange="loadPatientAppts()">
+          <button class="btn btn-ghost btn-sm" onclick="clearFilters('patient')">Clear</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>ID</th><th>Doctor</th><th>Department</th><th>Date & Time</th><th>Room</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="patientTbody"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     DOCTOR DASHBOARD
+═══════════════════════════════════════════════ -->
+<div id="page-doctor" class="page">
+  <nav class="topnav">
+    <div class="nav-left">
+      <span class="nav-logo">MediFlow</span>
+      <span class="nav-role-tag doctor-tag">Doctor</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-avatar doctor-av" id="drNavAvatar">D</div>
+      <span class="nav-name" id="drNavName">Doctor</span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div class="page-body">
+    <div class="dr-hero">
+      <div class="dr-hero-av" id="drHeroAv">DR</div>
+      <div>
+        <div class="dr-hero-name" id="drHeroName">Dr. Name</div>
+        <div class="dr-hero-dept" id="drHeroDept">Department</div>
+        <div class="dr-hero-room" id="drHeroRoom">Room 101</div>
+      </div>
+    </div>
+    <div class="stats-row" id="drStats"></div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">📆 Patient Schedule</div>
+      </div>
+      <div class="filter-bar">
+        <input type="date" id="drDateFilter" onchange="loadDrAppts()">
+        <select id="drStatusFilter" onchange="loadDrAppts()">
+          <option value="">All Status</option>
+          <option>Pending</option><option>Attended</option><option>Cancelled</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="clearFilters('doctor')">Clear</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Date</th><th>Time</th><th>Patient</th><th>Age / Sex</th><th>Phone</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="drTbody"></tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     RECEPTION DASHBOARD
+═══════════════════════════════════════════════ -->
+<div id="page-reception" class="page">
+  <nav class="topnav">
+    <div class="nav-left">
+      <span class="nav-logo">MediFlow</span>
+      <span class="nav-role-tag recep-tag">Reception</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-avatar recep-av">R</div>
+      <span class="nav-name">Front Desk</span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div class="page-body">
+    <div class="stats-row" id="recepStats"></div>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="r-all" onclick="switchTab(this,'r-all','reception')">📋 All Appointments</button>
+      <button class="tab-btn" data-tab="r-walkin" onclick="switchTab(this,'r-walkin','reception')">➕ Walk-In / Book</button>
+      <button class="tab-btn" data-tab="r-avail" onclick="switchTab(this,'r-avail','reception')">🔍 Availability</button>
+    </div>
+
+    <!-- ALL -->
+    <div id="tab-r-all" class="tab-panel active">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">🏥 All Hospital Appointments</div></div>
+        <div class="filter-bar">
+          <input type="text" id="rSearch" placeholder="🔍 Search patient, doctor, ID..." oninput="loadRecepAppts()">
+          <select id="rDeptFilter" onchange="loadRecepAppts()"><option value="">All Departments</option></select>
+          <select id="rStatusFilter" onchange="loadRecepAppts()">
+            <option value="">All Status</option>
+            <option>Pending</option><option>Attended</option><option>Cancelled</option>
+          </select>
+          <input type="date" id="rDateFilter" onchange="loadRecepAppts()">
+          <button class="btn btn-ghost btn-sm" onclick="clearFilters('reception')">Clear</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>ID</th><th>Patient</th><th>Doctor</th><th>Dept</th><th>Date & Time</th><th>Room</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="recepTbody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- WALK-IN -->
+    <div id="tab-r-walkin" class="tab-panel">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">➕ Register Walk-In Appointment</div></div>
+        <div class="form-grid">
+          <div class="field"><label>Patient Name *</label><input type="text" id="wName" placeholder="Patient name"></div>
+          <div class="field"><label>Phone</label><input type="tel" id="wPhone" placeholder="+91..."></div>
+          <div class="field"><label>Age</label><input type="number" id="wAge" placeholder="Age"></div>
+          <div class="field"><label>Sex</label>
+            <select id="wSex"><option value="">Select</option><option>Male</option><option>Female</option><option>Others</option></select>
+          </div>
+          <div class="field"><label>Department *</label>
+            <select id="wDept" onchange="deptChanged('wDept','wDr','wRoom')">
+              <option value="">Select Department</option>
+            </select>
+          </div>
+          <div class="field"><label>Doctor *</label>
+            <select id="wDr" onchange="drChanged('wDr','wRoom','wSlotWrap','wDate')">
+              <option value="">Select Doctor</option>
+            </select>
+          </div>
+          <div class="field"><label>Allocated Room</label><input type="text" id="wRoom" readonly placeholder="Auto-assigned"></div>
+          <div class="field"><label>Date *</label><input type="date" id="wDate" onchange="loadSlots('wDate','wDr','wSlot')"></div>
+          <div class="field" id="wSlotWrap">
+            <label>Time Slot *</label>
+            <select id="wSlot"><option value="">Select slot</option></select>
+          </div>
+          <div class="field"><label>Reason</label><input type="text" id="wReason" placeholder="Optional"></div>
+        </div>
+        <button class="btn btn-primary" onclick="submitWalkin()" style="margin-top:16px;">Register Appointment</button>
+      </div>
+    </div>
+
+    <!-- AVAILABILITY -->
+    <div id="tab-r-avail" class="tab-panel">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">🔍 Check Doctor Availability</div></div>
+        <div class="form-grid" style="max-width:600px;">
+          <div class="field"><label>Department</label>
+            <select id="avDept" onchange="deptChanged('avDept','avDr',null)">
+              <option value="">Select Department</option>
+            </select>
+          </div>
+          <div class="field"><label>Doctor</label>
+            <select id="avDr"><option value="">Select Doctor</option></select>
+          </div>
+          <div class="field"><label>Date</label><input type="date" id="avDate"></div>
+          <div class="field" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary btn-full" onclick="checkAvailability()">Check Slots</button>
+          </div>
+        </div>
+        <div id="availResult" style="margin-top:20px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
